@@ -1,0 +1,8 @@
+server:
+  port: 9202
+
+
+spring:
+  application:
+    name: oj-friend
+
