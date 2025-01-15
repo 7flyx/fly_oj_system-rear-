@@ -9,25 +9,12 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>oj-modules</artifactId>
+    <artifactId>oj-common</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-<!--        将实体类的部分共性属性，提取到了 common包下，这里就是将依赖引入过来-->
-        <dependency>
-            <groupId>com.fly</groupId>
-            <artifactId>oj-common-core</artifactId>
-            <version>${oj-common-core.version}</version>
-        </dependency>
-    </dependencies>
 
 </project>

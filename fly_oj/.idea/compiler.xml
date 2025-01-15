@@ -6,11 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="oj-friend" />
         <module name="oj-judge" />
         <module name="oj-modules" />
         <module name="oj-system" />
+        <module name="oj-common-core" />
+        <module name="oj-common" />
         <module name="oj-job" />
-        <module name="oj-friend" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -21,6 +23,8 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="bite-oj" options="-parameters" />
       <module name="fly_oj" options="" />
+      <module name="oj-common" options="-parameters" />
+      <module name="oj-common-core" options="-parameters" />
       <module name="oj-friend" options="-parameters" />
       <module name="oj-job" options="-parameters" />
       <module name="oj-judge" options="-parameters" />
