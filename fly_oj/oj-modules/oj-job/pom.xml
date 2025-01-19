@@ -5,9 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.fly</groupId>
-        <artifactId>fly_oj</artifactId>
+        <artifactId>oj-modules</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>oj-job</artifactId>

@@ -14,3 +14,5 @@ create table tb_sys_user (
     primary key (`user_id`),
     unique key `idx_user_account` (`user_account`) -- 加索引
 );
+
+docker run -d -p 8848:8848 -p 9848:9848 --name oj-nacos -e MODE=standalone -e JVM_XMS=256m -e JVM_XMX=256m -e SPRING_DATASOURCE_PLATFORM=mysql -e MYSQL_SERVICE_HOST=172.17.0.3 -e MYSQL_SERVICE_PORT=3306 -e MYSQL_SERVICE_DB_NAME=flyoj_nacos_dev -e MYSQL_SERVICE_USER=ojtest -e MYSQL_SERVICE_PASSWORD=2001 nacos/nacos-server:v2.2.3

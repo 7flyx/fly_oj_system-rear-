@@ -1,5 +1,6 @@
 package com.fly.common.core.domain;
 
+import com.fly.common.core.enums.ResultCode;
 import lombok.Data;
 
 // 返回数据类型，统一格式
@@ -22,18 +23,25 @@ public class R<T> {
         this.data = data;
     }
 
-    public static <T>R<T> success(int code, String msg) {
-        return success(code, msg, null);
-    }
-    public static <T>R<T> success(int code, String msg, T data) {
-        return new R<T>(code, msg, data);
+    public static <T>R<T> success() {
+        return success(ResultCode.SUCCESS);
     }
 
-    public static <T>R<T> failed(int code, String msg) {
-        return failed(code, msg, null);
+    public static <T>R<T> success(ResultCode resultCode) {
+        return success(resultCode, null);
+    }
+    public static <T>R<T> success(ResultCode resultCode,  T data) {
+        return new R<T>(resultCode.getCode(), resultCode.getMsg(), data);
     }
 
-    public static <T>R<T> failed(int code, String msg, T data) {
-        return new R<T>(code, msg, data);
+    public static <T>R<T> failed() {
+        return failed(ResultCode.FAILED);
+    }
+    public static <T>R<T> failed(ResultCode resultCode) {
+        return failed(resultCode, null);
+    }
+
+    public static <T>R<T> failed(ResultCode resultCode, T data) {
+        return new R<T>(resultCode.getCode(), resultCode.getMsg(), data);
     }
 }

@@ -1,7 +1,7 @@
 package com.fly.system.service;
 
-import com.fly.system.comtroller.LoginResult;
+import com.fly.common.core.domain.R;
 
 public interface ISysUserService {
-    LoginResult login(String userAccount ,String password);
+    R<Void> login(String userAccount , String password);
 }
