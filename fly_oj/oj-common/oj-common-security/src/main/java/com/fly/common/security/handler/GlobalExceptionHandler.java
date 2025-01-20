@@ -1,4 +1,4 @@
-package com.fly.common.security;
+package com.fly.common.security.handler;
 
 import com.fly.common.core.domain.R;
 import com.fly.common.core.enums.ResultCode;
