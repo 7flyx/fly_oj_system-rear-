@@ -1,10 +1,10 @@
 package com.fly.system.comtroller;
 
+import com.fly.common.core.controller.BashController;
 import com.fly.common.core.domain.R;
-import com.fly.system.domain.LoginDTO;
-import com.fly.system.domain.SysUser;
-import com.fly.system.domain.SysUserSaveDTO;
-import com.fly.system.domain.SysUserVO;
+import com.fly.system.domain.dto.LoginDTO;
+import com.fly.system.domain.dto.SysUserSaveDTO;
+import com.fly.system.domain.vo.SysUserVO;
 import com.fly.system.service.ISysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/sysUser")
 @Tag(name = "管理员接口")
-public class SysUserController {
+public class SysUserController extends BashController {
     @Autowired
     private ISysUserService sysUserService;
     @PostMapping("/login")
     @Operation(summary = "管理员登录", description = "根据账号密码进行管理员登录")
-    public R<Void> login(@RequestBody LoginDTO loginDTO) {
+    public R<String> login(@RequestBody LoginDTO loginDTO) {
         return sysUserService.login(loginDTO.getUserAccount(), loginDTO.getPassword());
     }
 
@@ -32,7 +32,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "1000", description = "操作成功")
     @ApiResponse(responseCode = "2000", description = "服务器繁忙,请稍后重试")
     public R<Void> add(@RequestBody SysUserSaveDTO sysUserSaveDTO) {
-        return null;
+        return toR(sysUserService.add(sysUserSaveDTO));
     }
 
     @DeleteMapping("/{userId}")

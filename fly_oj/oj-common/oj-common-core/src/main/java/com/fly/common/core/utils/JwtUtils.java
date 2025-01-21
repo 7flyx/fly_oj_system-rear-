@@ -1,4 +1,4 @@
-package com.fly.common.security.utils;
+package com.fly.common.core.utils;
 import com.fly.common.core.constants.JwtConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

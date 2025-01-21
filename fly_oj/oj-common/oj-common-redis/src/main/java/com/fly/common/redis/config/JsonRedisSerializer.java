@@ -1,4 +1,4 @@
-package com.fly.common.redis;
+package com.fly.common.redis.config;
 
 import com.alibaba.fastjson2.JSON;
 import org.springframework.data.redis.serializer.RedisSerializer;

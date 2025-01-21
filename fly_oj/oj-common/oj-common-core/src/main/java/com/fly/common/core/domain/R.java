@@ -27,6 +27,9 @@ public class R<T> {
         return success(ResultCode.SUCCESS);
     }
 
+    public static <T>R<T> success(T data) {
+        return success(ResultCode.SUCCESS, data);
+    }
     public static <T>R<T> success(ResultCode resultCode) {
         return success(resultCode, null);
     }
@@ -36,6 +39,9 @@ public class R<T> {
 
     public static <T>R<T> failed() {
         return failed(ResultCode.FAILED);
+    }
+    public static <T>R<T> failed(int code, String msg) {
+        return new R<T>(code, msg, null);
     }
     public static <T>R<T> failed(ResultCode resultCode) {
         return failed(resultCode, null);

@@ -1,4 +1,4 @@
-package com.fly.common.security.domain;
+package com.fly.common.core.domain;
 
 import lombok.Data;
 

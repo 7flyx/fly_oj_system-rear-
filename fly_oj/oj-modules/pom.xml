@@ -12,6 +12,9 @@
     <packaging>pom</packaging>
     <modules>
         <module>oj-system</module>
+        <module>oj-friend</module>
+        <module>oj-job</module>
+        <module>oj-judge</module>
     </modules>
 
     <properties>
@@ -47,6 +50,17 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fly</groupId>
+            <artifactId>oj-common-mybatis</artifactId>
+            <version>${oj-common-mybatis.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
     </dependencies>
 
