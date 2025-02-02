@@ -52,7 +52,7 @@ public class TableDataInfo {
     }
 
     //查出数据时调用
-    public static TableDataInfo success(List<?> list,long total) {
+    public static TableDataInfo success(List<?> list, long total) {
         TableDataInfo rspData = new TableDataInfo();
         rspData.setCode(ResultCode.SUCCESS.getCode());
         rspData.setRows(list);

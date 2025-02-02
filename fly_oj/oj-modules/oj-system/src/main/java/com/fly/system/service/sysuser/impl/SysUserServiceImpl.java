@@ -1,16 +1,20 @@
-package com.fly.system.service.impl;
+package com.fly.system.service.sysuser.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fly.common.core.constants.HttpConstants;
+import com.fly.common.core.domain.LoginUser;
 import com.fly.common.core.domain.R;
 import com.fly.common.core.enums.ResultCode;
 import com.fly.common.core.enums.UserIdentity;
 import com.fly.common.security.exception.ServiceException;
 import com.fly.common.security.service.TokenService;
-import com.fly.system.domain.SysUser;
-import com.fly.system.domain.dto.SysUserSaveDTO;
-import com.fly.system.mapper.SysUserMapper;
-import com.fly.system.service.ISysUserService;
+import com.fly.system.domain.sysuser.SysUser;
+import com.fly.system.domain.sysuser.dto.SysUserSaveDTO;
+import com.fly.system.domain.sysuser.vo.LoginUserVO;
+import com.fly.system.mapper.sysyser.SysUserMapper;
+import com.fly.system.service.sysuser.ISysUserService;
 import com.fly.system.utils.BCryptUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,17 +45,40 @@ public class SysUserServiceImpl implements ISysUserService {
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
         // select password from tb_sys_user where user_acount = #{userAccount}
         SysUser sysUser = sysUserMapper.selectOne(queryWrapper
-                .select(SysUser::getUserId, SysUser::getPassword).eq(SysUser::getUserAccount, userAccount));
+                .select(SysUser::getUserId, SysUser::getPassword, SysUser::getNickName).eq(SysUser::getUserAccount, userAccount));
         if (sysUser == null) {
             return R.failed(ResultCode.FAILED_USER_NOT_EXISTS);
         }
         // 将传输过来的密码跟数据库的密码进行对比
         if (BCryptUtils.matchesPassword(password, sysUser.getPassword())) {
             // 调用TokenServices的代码，会生成Token，并且写入redis中
-            String token = tokenService.createToken(sysUser.getUserId(), secret, UserIdentity.ADMIN.getValue());
+            String token = tokenService.createToken(sysUser.getUserId(), secret, UserIdentity.ADMIN.getValue(), sysUser.getNickName());
             return R.success(token);
         }
         return R.failed(ResultCode.FAILED_LOGIN);
+    }
+
+    @Override
+    public boolean logout(String token) {
+        if (StrUtil.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
+            token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
+        }
+        return tokenService.deleteLoginUser(token, secret);
+    }
+
+
+    @Override
+    public R<LoginUserVO> info(String token) {
+        if (StrUtil.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
+            token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
+        }
+        LoginUser loginUser = tokenService.getLoginUser(token, secret);
+        if (loginUser == null) {
+            R.failed();
+        }
+        LoginUserVO loginUserVO = new LoginUserVO();
+        loginUserVO.setNickName(loginUser.getNickName());
+        return R.success(loginUserVO);
     }
 
     @Override
@@ -77,4 +104,5 @@ public class SysUserServiceImpl implements ISysUserService {
         int row = sysUserMapper.insert(sysUser);
         return row;
     }
+
 }

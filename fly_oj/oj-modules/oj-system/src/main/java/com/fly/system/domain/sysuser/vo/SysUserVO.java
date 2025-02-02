@@ -1,4 +1,4 @@
-package com.fly.system.domain.vo;
+package com.fly.system.domain.sysuser.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

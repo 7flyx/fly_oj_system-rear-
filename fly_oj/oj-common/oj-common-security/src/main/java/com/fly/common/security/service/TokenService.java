@@ -23,7 +23,7 @@ public class TokenService {
     @Autowired
     private RedisService redisService;
 
-    public String createToken(Long userId, String secret, Integer identity) {
+    public String createToken(Long userId, String secret, Integer identity, String nickName) {
         Map<String, Object> claims = new HashMap<>(); // 唯一标识,也就是token中的数据载体部分
         String userKey = UUID.fastUUID().toString(); // tutool的jar包
         claims.put(JwtConstants.LOGIN_USER_ID, userId);
@@ -33,6 +33,7 @@ public class TokenService {
         String key = getTokenKey(userKey); // redis中的key值。加上了前缀 logintoken
         LoginUser loginUser = new LoginUser();
         loginUser.setIdentity(identity); // 1 普通用户；2 管理员用户
+        loginUser.setNickName(nickName);
         // 写入redis中，并且规定 过期时间 720分钟
         redisService.setCacheObject(key, loginUser, CacheConstants.EXP, TimeUnit.MINUTES);
         return token;
@@ -40,19 +41,19 @@ public class TokenService {
 
     // 延迟token的有效时间，就是延长redis中存储的用于用户身份认证的敏感信息的有效时间 439544273
     public void extendToken(String token, String secret){
-        Claims claims;
-        try {
-            claims = JwtUtils.parseToken(token, secret);
-            if (claims == null) {
-                log.error("解析token {},出现异常, ",token);
-                return;
-            }
-        } catch (Exception e) {
-            log.error("解析token {},出现异常, ",token, e);
-            return;
-        }
+//        Claims claims;
+//        try {
+//            claims = JwtUtils.parseToken(token, secret);
+//            if (claims == null) {
+//                log.error("解析token {},出现异常, ",token);
+//                return;
+//            }
+//        } catch (Exception e) {
+//            log.error("解析token {},出现异常, ",token, e);
+//            return;
+//        }
 
-        String userKey = JwtUtils.getUserKey(claims);
+        String userKey = getUserKey(token, secret);
         String tokenKey = getTokenKey(userKey);
 
         Long expire = redisService.getExpire(tokenKey, TimeUnit.MINUTES);
@@ -64,5 +65,33 @@ public class TokenService {
 
     private String getTokenKey(String userKey) {
         return CacheConstants.LOGIN_TOKEN_KEY + userKey;
+    }
+
+    private String getUserKey(String token, String secret) {
+        Claims claims;
+        try {
+            claims = JwtUtils.parseToken(token, secret);
+            if (claims == null) {
+                log.error("解析token {},出现异常, ",token);
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("解析token {},出现异常, ",token, e);
+            return null;
+        }
+
+       return JwtUtils.getUserKey(claims); // 获取jwt中的key
+    }
+
+    public LoginUser getLoginUser(String token, String secret) {
+        String userKey = getUserKey(token, secret);
+        if(userKey == null) return null;
+        return redisService.getCacheObject(getTokenKey(userKey), LoginUser.class);
+    }
+
+    public boolean deleteLoginUser(String token, String secret) {
+        String userKey = getUserKey(token, secret);
+        if(userKey == null) return false;
+        return redisService.deleteObject(getTokenKey(userKey));
     }
 }

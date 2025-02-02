@@ -1,4 +1,4 @@
-package com.fly.system.domain;
+package com.fly.system.domain.sysuser;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -13,4 +13,5 @@ public class SysUser extends BaseEntity {
     private Long userId; // 主键，不再使用自增主键
     private String userAccount; // 账号
     private String password; // 密码
+    private String nickName; // 昵称
 }

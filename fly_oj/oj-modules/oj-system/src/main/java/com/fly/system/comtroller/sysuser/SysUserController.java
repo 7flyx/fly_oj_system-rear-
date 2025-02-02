@@ -1,11 +1,13 @@
-package com.fly.system.comtroller;
+package com.fly.system.comtroller.sysuser;
 
-import com.fly.common.core.controller.BashController;
+import com.fly.common.core.constants.HttpConstants;
+import com.fly.common.core.controller.BaseController;
 import com.fly.common.core.domain.R;
-import com.fly.system.domain.dto.LoginDTO;
-import com.fly.system.domain.dto.SysUserSaveDTO;
-import com.fly.system.domain.vo.SysUserVO;
-import com.fly.system.service.ISysUserService;
+import com.fly.system.domain.sysuser.dto.LoginDTO;
+import com.fly.system.domain.sysuser.dto.SysUserSaveDTO;
+import com.fly.system.domain.sysuser.vo.LoginUserVO;
+import com.fly.system.domain.sysuser.vo.SysUserVO;
+import com.fly.system.service.sysuser.ISysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -16,15 +18,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/sysUser")
+@RequestMapping("/sysUser") // API网关那边 额外加了前缀 /system/
 @Tag(name = "管理员接口")
-public class SysUserController extends BashController {
+public class SysUserController extends BaseController {
     @Autowired
     private ISysUserService sysUserService;
+
+    // system/sysUser/login
     @PostMapping("/login")
     @Operation(summary = "管理员登录", description = "根据账号密码进行管理员登录")
     public R<String> login(@RequestBody LoginDTO loginDTO) {
         return sysUserService.login(loginDTO.getUserAccount(), loginDTO.getPassword());
+    }
+
+    @DeleteMapping("/logout")
+    public R<Void> logout(@RequestHeader(HttpConstants.AUTHENTICATION) String token) {
+        return toR(sysUserService.logout(token)); // true ok, false 不ok
     }
 
     @PostMapping("/add")
@@ -52,6 +61,11 @@ public class SysUserController extends BashController {
     })
     public R<SysUserVO> detail(@RequestParam(required = true) Long userId, @RequestParam(required = false) String sex) {
         return null;
+    }
+
+    @GetMapping("/info")
+    public R<LoginUserVO> info(@RequestHeader(HttpConstants.AUTHENTICATION) String token) {
+        return sysUserService.info(token);
     }
 }
 

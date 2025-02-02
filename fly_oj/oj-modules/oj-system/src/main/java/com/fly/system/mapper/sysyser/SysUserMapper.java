@@ -1,7 +1,7 @@
-package com.fly.system.mapper;
+package com.fly.system.mapper.sysyser;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.fly.system.domain.SysUser;
+import com.fly.system.domain.sysuser.SysUser;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

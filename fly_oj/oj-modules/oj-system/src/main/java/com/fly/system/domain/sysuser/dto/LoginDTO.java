@@ -1,4 +1,4 @@
-package com.fly.system.domain.dto;
+package com.fly.system.domain.sysuser.dto;
 
 import lombok.Data;
 
