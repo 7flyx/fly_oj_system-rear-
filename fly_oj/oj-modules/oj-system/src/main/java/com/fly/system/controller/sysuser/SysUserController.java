@@ -1,4 +1,4 @@
-package com.fly.system.comtroller.sysuser;
+package com.fly.system.controller.sysuser;
 
 import com.fly.common.core.constants.HttpConstants;
 import com.fly.common.core.controller.BaseController;

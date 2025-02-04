@@ -1,4 +1,4 @@
-package com.fly.system.comtroller.question;
+package com.fly.system.controller.question;
 
 import com.fly.common.core.controller.BaseController;
 import com.fly.common.core.domain.R;

@@ -75,6 +75,13 @@ create table tb_exam_question(
     primary key (`exam_question_id`)
 );
 
+"Failed to convert property value of type 'java.lang.String' to required type 'java.time.LocalDateTime'
+for property 'endTime'; Failed to convert from type [java.lang.String] to type [java.time.LocalDateTime]
+for value '2025-03-04T16:00:00.000Z', Failed to convert property value of type 'java.lang.String' to required type
+'java.time.LocalDateTime' for property 'startTime'; Failed to convert from type [java.lang.String] to type
+[java.time.LocalDateTime] for value '2025-02-04T16:00:00.000Z'",
+
+
 
 
 
