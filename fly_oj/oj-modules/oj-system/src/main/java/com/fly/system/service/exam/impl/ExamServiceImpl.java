@@ -9,8 +9,10 @@ import com.fly.common.security.exception.ServiceException;
 import com.fly.system.domain.exam.Exam;
 import com.fly.system.domain.exam.ExamQuestion;
 import com.fly.system.domain.exam.dto.ExamAddDTO;
+import com.fly.system.domain.exam.dto.ExamEditDTO;
 import com.fly.system.domain.exam.dto.ExamQueryDTO;
 import com.fly.system.domain.exam.dto.ExamQuestionDTO;
+import com.fly.system.domain.exam.vo.ExamDetailVO;
 import com.fly.system.domain.exam.vo.ExamVO;
 import com.fly.system.domain.question.Question;
 import com.fly.system.domain.question.vo.QuestionVO;
@@ -22,6 +24,7 @@ import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -44,24 +47,19 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper, ExamQuestio
     }
 
     @Override
-    public int add(ExamAddDTO examAddDTO) {
-        // 开始时间 居然 晚于 结束时间，抛异常
-        if (examAddDTO.getStartTime().isAfter(examAddDTO.getEndTime())) {
-            throw new ServiceException(ResultCode.EXAM_START_TIME_AFTER_END_TIME);
-        }
-        List<Exam> exams = examMapper.selectList(new LambdaQueryWrapper<Exam>()
-                .eq(Exam::getTitle, examAddDTO.getTitle()));
-        if(exams != null || exams.size() != 0) { // 竞赛名称重复了
-            throw new ServiceException(ResultCode.EXAM_TITIE_ALREADY_EXISTS);
-        }
+    public Long add(ExamAddDTO examAddDTO) {
+        checkExamSaveParams(examAddDTO, null);
         Exam exam = new Exam();
         BeanUtil.copyProperties(examAddDTO, exam);
-        return examMapper.insert(exam);
+        examMapper.insert(exam);
+        return exam.getExamId();
     }
+
+
 
     @Override
     public boolean questionAdd(ExamQuestionDTO examQuestionDTO) {
-        Exam exam = getExam(examQuestionDTO);
+        Exam exam = getExam(examQuestionDTO.getExamId());
         Set<Long> questionIdSet = examQuestionDTO.getQuestionIdSet();
         if (CollectionUtil.isEmpty(questionIdSet)) {
             return true;
@@ -71,6 +69,56 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper, ExamQuestio
             throw new ServiceException(ResultCode.EXAM_QUESTION_NOT_EXISTS);
         }
         return saveExamQuestion(exam, questionIdSet);
+    }
+
+    @Override
+    public int questionDelete(Long examId, Long questionId) {
+        Exam exam = getExam(examId);
+        checkExam(exam);
+        return examQuestionMapper.delete(new LambdaQueryWrapper<ExamQuestion>()
+                .eq(ExamQuestion::getExamId, examId)
+                .eq(ExamQuestion::getQuestionId, questionId));
+
+    }
+
+    @Override
+    public ExamDetailVO detail(Long examId) {
+        ExamDetailVO result = new ExamDetailVO();
+        Exam exam = getExam(examId);
+        // 竞赛的基本信息
+        BeanUtil.copyProperties(exam, result);
+        List<ExamQuestion> examQuestionList = examQuestionMapper.selectList(new LambdaQueryWrapper<ExamQuestion>()
+                .select(ExamQuestion::getQuestionId)
+                .eq(ExamQuestion::getExamId, examId));
+        if (CollectionUtil.isEmpty(examQuestionList)) {
+            // 返回详情
+            return result;
+        }
+        // 竞赛的题目信息
+        List<Long> questionIdList = examQuestionList.stream().map(ExamQuestion::getQuestionId).toList();
+        List<Question> questions = questionMapper.selectList(new LambdaQueryWrapper<Question>()
+                .select(Question::getQuestionId, Question::getTitle, Question::getDifficulty)
+                .in(Question::getQuestionId, questionIdList));
+        List<QuestionVO> questionVOList = BeanUtil.copyToList(questions, QuestionVO.class);
+        result.setExamQuestionList(questionVOList);
+        return result;
+    }
+
+    @Override
+    public int edit(ExamEditDTO examEditDTO) {
+        Exam exam = getExam(examEditDTO.getExamId());
+        checkExamSaveParams(examEditDTO, examEditDTO.getExamId()); // 检查参数的合法性
+
+        exam.setTitle(examEditDTO.getTitle());
+        exam.setStartTime(examEditDTO.getStartTime());
+        exam.setEndTime(examEditDTO.getEndTime());
+        return examMapper.updateById(exam);
+    }
+
+    private void checkExam(Exam exam) {
+        if(exam.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new ServiceException(ResultCode.EXAM_STARED);
+        }
     }
 
     private boolean saveExamQuestion(Exam exam, Set<Long> questionIdSet) {
@@ -92,11 +140,25 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper, ExamQuestio
         return saveBatch(examQuestionList); // 来自 Mybatis plus的扩展模块
     }
 
-    private Exam getExam(ExamQuestionDTO examQuestionDTO) {
-        Exam exam = examMapper.selectById(examQuestionDTO.getExamId());
+    private Exam getExam(Long examId) {
+        Exam exam = examMapper.selectById(examId);
         if (exam == null) {
             throw new ServiceException(ResultCode.FAILED_ALREADY_EXISTS);
         }
         return exam;
     }
+
+    private void checkExamSaveParams(ExamAddDTO examSaveDTO, Long examId) {
+        // 开始时间 居然 晚于 结束时间，抛异常
+        if (examSaveDTO.getStartTime().isAfter(examSaveDTO.getEndTime())) {
+            throw new ServiceException(ResultCode.EXAM_START_TIME_AFTER_END_TIME);
+        }
+        List<Exam> exams = examMapper.selectList(new LambdaQueryWrapper<Exam>()
+                .eq(Exam::getTitle, examSaveDTO.getTitle())
+                .ne(Exam::getExamId, examId));
+        if(exams.size() != 0) { // 竞赛名称重复了
+            throw new ServiceException(ResultCode.EXAM_TITIE_ALREADY_EXISTS);
+        }
+    }
+
 }
