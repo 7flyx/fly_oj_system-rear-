@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fly.common.core.constants.Constants;
 import com.fly.common.core.enums.ResultCode;
 import com.fly.common.security.exception.ServiceException;
 import com.fly.system.domain.exam.Exam;
@@ -38,6 +39,7 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper, ExamQuestio
     private QuestionMapper questionMapper;
     @Autowired
     private ExamQuestionMapper examQuestionMapper;
+
     @Override
     public List<ExamVO> list(ExamQueryDTO examQueryDTO) {
         // 分页之后的剩余的数据，不是总的数据量
@@ -54,7 +56,6 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper, ExamQuestio
         examMapper.insert(exam);
         return exam.getExamId();
     }
-
 
 
     @Override
@@ -116,7 +117,7 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper, ExamQuestio
     }
 
     private void checkExam(Exam exam) {
-        if(exam.getStartTime().isBefore(LocalDateTime.now())) {
+        if (exam.getStartTime().isBefore(LocalDateTime.now())) {
             throw new ServiceException(ResultCode.EXAM_STARED);
         }
     }
@@ -143,7 +144,7 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper, ExamQuestio
     private Exam getExam(Long examId) {
         Exam exam = examMapper.selectById(examId);
         if (exam == null) {
-            throw new ServiceException(ResultCode.FAILED_ALREADY_EXISTS);
+            throw new ServiceException(ResultCode.FAILED_NOT_EXISTS);
         }
         return exam;
     }
@@ -156,9 +157,45 @@ public class ExamServiceImpl extends ServiceImpl<ExamQuestionMapper, ExamQuestio
         List<Exam> exams = examMapper.selectList(new LambdaQueryWrapper<Exam>()
                 .eq(Exam::getTitle, examSaveDTO.getTitle())
                 .ne(Exam::getExamId, examId));
-        if(exams.size() != 0) { // 竞赛名称重复了
-            throw new ServiceException(ResultCode.EXAM_TITIE_ALREADY_EXISTS);
+        if (exams.size() != 0) { // 竞赛名称重复了
+            throw new ServiceException(ResultCode.EXAM_TITLE_ALREADY_EXISTS);
         }
     }
+
+    @Override
+    public int delete(Long examId) {
+        Exam exam = getExam(examId);
+        checkExam(exam);
+        // 删除竞赛中的题目信息
+        examQuestionMapper.delete(new LambdaQueryWrapper<ExamQuestion>()
+                .eq(ExamQuestion::getExamId, examId));
+        // 删除竞赛
+        return examMapper.deleteById(exam);
+    }
+
+    @Override
+    public int publish(Long examId) {
+        Exam exam = getExam(examId);
+        if (exam.getEndTime().isBefore(LocalDateTime.now())) {
+            throw new ServiceException(ResultCode.EXAM_STARED);
+        }
+        Long count = examQuestionMapper.selectCount(new LambdaQueryWrapper<ExamQuestion>()
+                .eq(ExamQuestion::getExamId, examId));
+        if (count == null || count <= 0) { // 竞赛中没有任何题目
+            throw new ServiceException(ResultCode.EXAM_NOT_HAS_QUESTION);
+        }
+        exam.setStatus(Constants.TRUE);
+
+        return examMapper.updateById(exam);
+    }
+
+    @Override
+    public int cancelPublish(Long examId) {
+        Exam exam = getExam(examId);
+        checkExam(exam); // 检查竞赛是否已经开始了
+        exam.setStatus(Constants.FALSE);
+        return examMapper.updateById(exam);
+    }
+
 
 }

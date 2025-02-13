@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
         String requestURI = request.getRequestURI();
         ResultCode resultCode = e.getResultCode();
         log.error("请求地址'{}',发⽣业务异常.", requestURI, resultCode.getMsg(), e);
-        return R.failed(ResultCode.ERROR);
+        return R.failed(resultCode);
     }
 
 

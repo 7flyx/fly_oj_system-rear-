@@ -1,3 +1,13 @@
-09:53:25.943 [main] ERROR c.a.n.c.r.client - [printIfErrorEnabled,102] - Connection is unregistered, switch server, connectionId = 1738806805243_172.17.0.1_56436, request = ConfigQueryRequest
-09:53:26.055 [main] ERROR c.a.n.c.r.client - [printIfErrorEnabled,102] - Send request fail, request = ConfigQueryRequest{headers={charset=UTF-8, Client-AppName=unknown, Client-RequestToken=da43fa1b6ca641b7d4680c9c290b6fe6, Client-RequestTS=1738806805669, exConfigInfo=true, notify=false}, requestId='null'}, retryTimes = 0, errorMessage = Connection is unregistered.
-09:53:26.166 [main] ERROR c.a.n.c.r.client - [printIfErrorEnabled,102] - Send request fail, request = ConfigQueryRequest{headers={charset=UTF-8, Client-AppName=unknown, Client-RequestToken=da43fa1b6ca641b7d4680c9c290b6fe6, Client-RequestTS=1738806805669, exConfigInfo=true, notify=false}, requestId='null'}, retryTimes = 1, errorMessage = Client not connected, current status:UNHEALTHY
+12:58:39.339 [reactor-http-nio-2] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/system/test/sendCode
+13:00:11.009 [reactor-http-nio-2] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/system/test/sendCode
+13:01:14.702 [reactor-http-nio-6] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+13:01:45.214 [reactor-http-nio-6] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+13:02:00.394 [reactor-http-nio-8] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+13:05:22.433 [reactor-http-nio-10] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+13:06:28.427 [reactor-http-nio-12] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+13:07:07.569 [reactor-http-nio-2] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+13:27:17.047 [reactor-http-nio-4] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+13:37:05.663 [reactor-http-nio-3] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+13:44:09.598 [reactor-http-nio-3] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+13:44:09.603 [reactor-http-nio-5] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+15:08:21.089 [reactor-http-nio-3] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode

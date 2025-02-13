@@ -40,8 +40,6 @@ create table tb_question(
     update_time datetime comment '更新时间',
     primary key (`question_id`)
 );
-164160 + 226800 + 90000
-13300 - 4000 - 3000 = 6300
 
 -- 竞赛管理
 -- B端：列表、新增、编辑、删除、发布、撤销发布
@@ -75,11 +73,30 @@ create table tb_exam_question(
     primary key (`exam_question_id`)
 );
 
-"Failed to convert property value of type 'java.lang.String' to required type 'java.time.LocalDateTime'
-for property 'endTime'; Failed to convert from type [java.lang.String] to type [java.time.LocalDateTime]
-for value '2025-03-04T16:00:00.000Z', Failed to convert property value of type 'java.lang.String' to required type
-'java.time.LocalDateTime' for property 'startTime'; Failed to convert from type [java.lang.String] to type
-[java.time.LocalDateTime] for value '2025-02-04T16:00:00.000Z'",
+
+-- 用户管理
+-- B端：列表、拉黑功能
+-- C端：登录、注册、退出登录、个人中心
+create table tb_user(
+    user_id bigint unsigned not null comment '用户id(主键)',
+    nick_name varchar(50) comment '昵称',
+    head_image varchar(100) comment '用户头像/存储的图片的地址',
+    sex tinyint comment '性别/1男/2女',
+    phone char(11) not null comment '手机号(国内)',
+    code char(6) comment '手机验证码',
+    email varchar(30) comment '邮箱',
+    wechat varchar(30) comment 'vx号',
+    school_name varchar(50) comment '学校',
+    major_name varchar(50) comment '专业',
+    introduce varchar(200) comment '个人介绍',
+    status tinyint not null comment '用户状态/拉黑0/正常1',
+    -- 以下是回溯相关的字段
+    create_by bigint unsigned not null comment '创建人',
+    create_time datetime not null comment '创建时间',
+    update_by bigint unsigned comment '更新人',
+    update_time datetime comment '更新时间',
+    primary key(`user_id`)
+);
 
 
 
