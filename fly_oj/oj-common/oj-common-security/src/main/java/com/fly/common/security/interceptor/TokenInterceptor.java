@@ -1,7 +1,10 @@
 package com.fly.common.security.interceptor;
 
 import cn.hutool.core.util.StrUtil;
+import io.jsonwebtoken.Claims;
+import com.fly.common.core.constants.Constants;
 import com.fly.common.core.constants.HttpConstants;
+import com.fly.common.core.utils.ThreadLocalUtil;
 import com.fly.common.security.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +28,12 @@ public class TokenInterceptor implements HandlerInterceptor {
             return true;
         }
         tokenService.extendToken(token, secret);
+
+        Claims claims = tokenService.getClaims(token, secret);
+        Long userId = tokenService.getUserId(claims);
+        String userKey = tokenService.getUserKey(claims);
+        ThreadLocalUtil.set(Constants.USER_ID, userId);
+        ThreadLocalUtil.set(Constants.USER_KEY, userKey);
         return true;
     }
 
@@ -36,5 +45,4 @@ public class TokenInterceptor implements HandlerInterceptor {
         }
         return token;
     }
-
 }

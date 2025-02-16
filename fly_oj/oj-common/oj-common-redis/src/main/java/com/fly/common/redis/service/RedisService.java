@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
-public class RedisService {
+public class  RedisService {
 
     @Autowired
     public RedisTemplate redisTemplate;
@@ -175,6 +175,15 @@ public class RedisService {
 
     public <T> Long removeForList(final String key, int index) {
         return redisTemplate.opsForList().remove(key, 1L, redisTemplate.opsForList().index(key, index));
+    }
+
+    public <T> Long indexOfForList(final String key, T value) {
+        return redisTemplate.opsForList().indexOf(key,value);
+    }
+
+    public <T> T indexForList(final String key, long index, Class<T> clazz) {
+        Object t = redisTemplate.opsForList().index(key, index);
+        return JSON.parseObject(String.valueOf(t), clazz);
     }
 
 

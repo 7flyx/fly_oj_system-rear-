@@ -1,0 +1,3 @@
+com.fly.common.file.config.OSSConfig
+com.fly.common.file.service.OSSService
+com.fly.common.file.config.OSSProperties

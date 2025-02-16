@@ -23,7 +23,7 @@ public class TokenService {
     @Autowired
     private RedisService redisService;
 
-    public String createToken(Long userId, String secret, Integer identity, String nickName) {
+    public String createToken(Long userId, String secret, Integer identity, String nickName, String headImage) {
         Map<String, Object> claims = new HashMap<>(); // 唯一标识,也就是token中的数据载体部分
         String userKey = UUID.fastUUID().toString(); // tutool的jar包
         claims.put(JwtConstants.LOGIN_USER_ID, userId);
@@ -34,6 +34,7 @@ public class TokenService {
         LoginUser loginUser = new LoginUser();
         loginUser.setIdentity(identity); // 1 普通用户；2 管理员用户
         loginUser.setNickName(nickName);
+        loginUser.setHeadImage(headImage);
         // 写入redis中，并且规定 过期时间 720分钟
         redisService.setCacheObject(key, loginUser, CacheConstants.EXP, TimeUnit.MINUTES);
         return token;
@@ -94,4 +95,40 @@ public class TokenService {
         if(userKey == null) return false;
         return redisService.deleteObject(getTokenKey(userKey));
     }
+
+    // 刷新缓存中的头像地址和昵称
+    public void refreshLoginUser(String nickName, String headImage, String userKey) {
+        String tokenKey = getTokenKey(userKey);
+        LoginUser loginUser = redisService.getCacheObject(tokenKey, LoginUser.class);
+        loginUser.setNickName(nickName);
+        loginUser.setHeadImage(headImage);
+        redisService.setCacheObject(tokenKey, loginUser);
+    }
+
+    public Long getUserId(Claims claims) {
+        if (claims == null) return null;
+        return Long.valueOf(JwtUtils.getUserId(claims));  //获取jwt中的key
+    }
+
+    public String getUserKey(Claims claims) {
+        if (claims == null) return null;
+        return JwtUtils.getUserKey(claims);  //获取jwt中的key
+    }
+
+    public Claims getClaims(String token, String secret) {
+        Claims claims;
+        try {
+            claims = JwtUtils.parseToken(token, secret); //获取令牌中信息  解析payload中信息  存储着用户唯一标识信息
+            if (claims == null) {
+                log.error("解析token：{}, 出现异常", token);
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("解析token：{}, 出现异常", token, e);
+            return null;
+        }
+        return claims;
+    }
+
+
 }

@@ -1,13 +1,3 @@
-12:58:39.339 [reactor-http-nio-2] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/system/test/sendCode
-13:00:11.009 [reactor-http-nio-2] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/system/test/sendCode
-13:01:14.702 [reactor-http-nio-6] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
-13:01:45.214 [reactor-http-nio-6] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
-13:02:00.394 [reactor-http-nio-8] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
-13:05:22.433 [reactor-http-nio-10] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
-13:06:28.427 [reactor-http-nio-12] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
-13:07:07.569 [reactor-http-nio-2] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
-13:27:17.047 [reactor-http-nio-4] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
-13:37:05.663 [reactor-http-nio-3] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
-13:44:09.598 [reactor-http-nio-3] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
-13:44:09.603 [reactor-http-nio-5] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
-15:08:21.089 [reactor-http-nio-3] ERROR c.f.g.f.AuthFilter - [unauthorizedResponse,168] - [鉴权异常处理]请求路径:/friend/test/sendCode
+10:01:00.505 [main] ERROR c.a.n.c.r.client - [printIfErrorEnabled,102] - Connection is unregistered, switch server, connectionId = 1739671259762_172.17.0.1_41514, request = ConfigQueryRequest
+10:01:00.620 [main] ERROR c.a.n.c.r.client - [printIfErrorEnabled,102] - Send request fail, request = ConfigQueryRequest{headers={charset=UTF-8, Client-AppName=unknown, Client-RequestToken=5d980ab6a75b6cd3dfd7d4cfbd11f263, Client-RequestTS=1739671260237, exConfigInfo=true, notify=false}, requestId='null'}, retryTimes = 0, errorMessage = Connection is unregistered.
+10:01:00.728 [main] ERROR c.a.n.c.r.client - [printIfErrorEnabled,102] - Send request fail, request = ConfigQueryRequest{headers={charset=UTF-8, Client-AppName=unknown, Client-RequestToken=5d980ab6a75b6cd3dfd7d4cfbd11f263, Client-RequestTS=1739671260237, exConfigInfo=true, notify=false}, requestId='null'}, retryTimes = 1, errorMessage = Client not connected, current status:UNHEALTHY

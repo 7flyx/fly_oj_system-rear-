@@ -52,7 +52,7 @@ public class SysUserServiceImpl implements ISysUserService {
         // 将传输过来的密码跟数据库的密码进行对比
         if (BCryptUtils.matchesPassword(password, sysUser.getPassword())) {
             // 调用TokenServices的代码，会生成Token，并且写入redis中
-            String token = tokenService.createToken(sysUser.getUserId(), secret, UserIdentity.ADMIN.getValue(), sysUser.getNickName());
+            String token = tokenService.createToken(sysUser.getUserId(), secret, UserIdentity.ADMIN.getValue(), sysUser.getNickName(), null);
             return R.success(token);
         }
         return R.failed(ResultCode.FAILED_LOGIN);

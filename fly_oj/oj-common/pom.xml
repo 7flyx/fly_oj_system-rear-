@@ -18,6 +18,8 @@
         <module>oj-common-security</module>
         <module>oj-common-mybatis</module>
         <module>oj-common-message</module>
+        <module>oj-common-elasticsearch</module>
+        <module>oj-common-file</module>
     </modules>
 
     <properties>

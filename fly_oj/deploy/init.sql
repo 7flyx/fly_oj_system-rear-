@@ -18,6 +18,12 @@ create table tb_sys_user (
 
 -- docker run -d -p 8848:8848 -p 9848:9848 --name oj-nacos -e MODE=standalone -e JVM_XMS=256m -e JVM_XMX=256m -e SPRING_DATASOURCE_PLATFORM=mysql -e MYSQL_SERVICE_HOST=172.17.0.3 -e MYSQL_SERVICE_PORT=3306 -e MYSQL_SERVICE_DB_NAME=flyoj_nacos_dev -e MYSQL_SERVICE_USER=ojtest -e MYSQL_SERVICE_PASSWORD=2001 nacos/nacos-server:v2.2.3
 
+-- elasticsearch 相关
+
+-- docker run -d --name oj-es-dev -e "ES_JAVA_OPTS=-Xms256m -Xmx256m" -e "discovery.type=single-node" -v E:\Github_Coding\fly_oj_system-rear-\fly_oj\deploy\dev\elasticSearch\es-plugins:/usr/share/elasticsearch/plugins -e "xpack.security.enabled=false" --privileged --network oj-network -p 9200:9200 -p 9300:9300 elasticsearch:8.5.3
+
+-- docker run -d --name oj-kibana-dev -e "ELASTICSEARCH_HOSTS=http://oj-es-dev:9200" -e "I18N_LOCALE=zh-CN" -p15601:5601 --net=oj-network kibana:8.5.3
+
 
 --
 -- B端：题目列表，添加题目，编辑，删除
@@ -98,6 +104,25 @@ create table tb_user(
     primary key(`user_id`)
 );
 
+
+-- 用户提交题目答案 表
+create table tb_user_submit(
+    submit_id bigint unsigned not null comment '提交记录id',
+    user_id bigint unsigned not null comment '用户id',
+    question_id bigint unsigned not null comment '题目id',
+    exam_id bigint unsigned comment '竞赛id',
+    program_type tinyint not null comment '代码类型 0：java，1：cpp，2：python3',
+    user_code text not null comment '用户提交的代码',
+    pass tinyint not null comment '0：未通过，1：已通过',
+    exe_message varchar(500) not null comment '执行结果',
+    score int not null default '0' comment '得分',
+    -- 以下是回溯相关的字段
+    create_by bigint unsigned not null comment '创建人',
+    create_time datetime not null comment '创建时间',
+    update_by bigint unsigned comment '更新人',
+    update_time datetime comment '更新时间',
+    primary key(`submit_id`)
+);
 
 
 
