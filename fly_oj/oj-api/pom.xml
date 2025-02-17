@@ -5,38 +5,31 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.fly</groupId>
-        <artifactId>oj-modules</artifactId>
+        <artifactId>fly_oj</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>oj-judge</artifactId>
+    <artifactId>oj-api</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-        </dependency>
-
-<!--        docker的javaapi-->
-        <dependency>
-            <groupId>com.github.docker-java</groupId>
-            <artifactId>docker-java</artifactId>
-            <version>3.3.4</version>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.fly</groupId>
-            <artifactId>oj-api</artifactId>
+            <artifactId>oj-common-core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

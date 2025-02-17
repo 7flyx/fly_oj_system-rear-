@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/oj-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/oj-api/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oj-common/oj-common-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oj-common/oj-common-elasticsearch/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oj-common/oj-common-file/src/main/java" charset="UTF-8" />
@@ -20,6 +22,7 @@
     <file url="file://$PROJECT_DIR$/oj-modules/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../毕业设计/Java-微服务的编程测评系统课件+(1)/bite-oj/oj-api/src/main/resources" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

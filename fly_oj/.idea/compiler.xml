@@ -18,12 +18,15 @@
         <module name="oj-common-elasticsearch" />
         <module name="oj-friend" />
         <module name="oj-system" />
+        <module name="oj-api" />
         <module name="oj-job" />
         <module name="oj-common-redis" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="bite-oj" target="17" />
+      <module name="oj-api (1) (com.fly)" target="17" />
+      <module name="oj-api (2) (com.bite)" target="17" />
       <module name="oj-common-redis (2) (com.bite)" target="17" />
       <module name="oj-common-redis2 (2) (com.bite)" target="17" />
     </bytecodeTargetLevel>
@@ -32,6 +35,8 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="bite-oj" options="-parameters" />
       <module name="fly_oj" options="" />
+      <module name="oj-api" options="-parameters" />
+      <module name="oj-api (2) (com.bite)" options="-parameters" />
       <module name="oj-common" options="" />
       <module name="oj-common-core" options="-parameters" />
       <module name="oj-common-elasticsearch" options="-parameters" />
