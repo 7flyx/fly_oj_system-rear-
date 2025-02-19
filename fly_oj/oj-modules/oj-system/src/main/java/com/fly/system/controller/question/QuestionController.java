@@ -29,6 +29,7 @@ public class QuestionController extends BaseController {
     // 添加题目
     @PostMapping("/add")
     public R<Void> add(@RequestBody QuestionAddDTO questionAddDTO) {
+        System.out.println("添加题目功能" + questionAddDTO.getTitle());
         return toR(questionService.add(questionAddDTO));
     }
 

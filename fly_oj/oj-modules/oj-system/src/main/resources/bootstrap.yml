@@ -2,16 +2,19 @@ spring:
   application:
     name: oj-system
   profiles:
-    # 环境配置
     active: local
   cloud:
     nacos:
       discovery:
-        namespace: 62113bd0-93ee-4621-9b30-60de09bd5520 # 来自nacos配置中心的命名空间
-        server-addr: http://localhost:8848
+        namespace: 3ec50842-a66e-41b4-a39e-6321b7f9bd5d
+        server-addr: http://39.99.41.46:8848
+        username: nacos
+        password: nacosflyoj_8
+        ip: ${HOST_IP}
       config:
-        namespace: 62113bd0-93ee-4621-9b30-60de09bd5520 # 来自nacos配置中心的命名空间
-        server-addr: http://localhost:8848
+        namespace: 3ec50842-a66e-41b4-a39e-6321b7f9bd5d
+        server-addr: http://39.99.41.46:8848
         file-extension: yaml
-
+        username: nacos
+        password: nacosflyoj_8
 
