@@ -1,6 +1,7 @@
 package com.fly.judge.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fly.api.domain.UserExeResult;
 import com.fly.api.domain.dto.JudgeSubmitDTO;
@@ -12,6 +13,7 @@ import com.fly.judge.domain.SandBoxExecuteResult;
 import com.fly.judge.domain.UserSubmit;
 import com.fly.judge.mapper.UserSubmitMapper;
 import com.fly.judge.service.IJudgeService;
+import com.fly.judge.service.ISandboxPoolService;
 import com.fly.judge.service.ISandboxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,100 +21,125 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class JudgeServiceImpl implements IJudgeService {
 
     @Autowired
     private ISandboxService sandboxService;
 
     @Autowired
+    private ISandboxPoolService sandboxPoolService;
+
+    @Autowired
     private UserSubmitMapper userSubmitMapper;
 
     @Override
     public UserQuestionResultVO doJudgeJavaCode(JudgeSubmitDTO judgeSubmitDTO) {
-        SandBoxExecuteResult result =
-                sandboxService.exeJavaCode(judgeSubmitDTO.getUserId(), judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList());
+        log.info("---- 判题逻辑开始 -------");
+        SandBoxExecuteResult sandBoxExecuteResult =
+                sandboxPoolService.exeJavaCode(judgeSubmitDTO.getUserId(), judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList());
         UserQuestionResultVO userQuestionResultVO = new UserQuestionResultVO();
-        if (result != null && CodeRunStatus.SUCCEED.equals(result.getRunStatus())) { // 运行成功
-            // 比对执行结果，时间限制 空间限制
-            doJudge(judgeSubmitDTO, result, userQuestionResultVO);
-        } else { // 运行失败
+        if (sandBoxExecuteResult != null && CodeRunStatus.SUCCEED.equals(sandBoxExecuteResult.getRunStatus())) {
+            //比对直接结果  时间限制  空间限制的比对
+            userQuestionResultVO = doJudge(judgeSubmitDTO, sandBoxExecuteResult, userQuestionResultVO);
+        } else {
             userQuestionResultVO.setPass(Constants.FALSE);
-            if (result.getExeMessage() != null) {
-                userQuestionResultVO.setExeMessage(result.getExeMessage());
+            if (sandBoxExecuteResult != null) {
+                userQuestionResultVO.setExeMessage(sandBoxExecuteResult.getExeMessage());
             } else {
                 userQuestionResultVO.setExeMessage(CodeRunStatus.UNKNOWN_FAILED.getMsg());
             }
             userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
         }
         saveUserSubmit(judgeSubmitDTO, userQuestionResultVO);
+        log.info("判题逻辑结束，判题结果为： {} ", userQuestionResultVO);
         return userQuestionResultVO;
     }
 
-    private void doJudge(JudgeSubmitDTO judgeSubmitDTO,
-                         SandBoxExecuteResult result,
-                         UserQuestionResultVO userQuestionResultVO) {
-        List<String> exeOutputList = result.getOutputList(); // 实际执行的输出结果
-        List<String> outputList = judgeSubmitDTO.getOutputList(); // 预期的执行结果
-        if (exeOutputList.size() != outputList.size()) {
-            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE); // 成绩
-            userQuestionResultVO.setPass(Constants.FALSE); // 是否通过
-            userQuestionResultVO.setExeMessage(CodeRunStatus.NOT_ALL_PASSED.getMsg()); // 没有通过用例
-        } else {
-            boolean passed = true;
-            List<UserExeResult> list = new ArrayList<>(); // 没通过的测试用例
-            for (int i = 0; i < outputList.size(); i++) {
-                String output = outputList.get(i);
-                String exeOutput = exeOutputList.get(i);
-
-                if (!output.equals(exeOutput)) { // 将测试没通过的测试用例，返回
-                    String input = judgeSubmitDTO.getInputList().get(i);
-                    passed = false;
-                    UserExeResult tmp = new UserExeResult();
-                    tmp.setOutput(output);
-                    tmp.setInput(input);
-                    tmp.setExeOutput(exeOutput);
-                    userQuestionResultVO.setUserExeResultList(list);
-                    break;
-                }
-            }
-            if(!passed) { // 没有通过测试用例
-                userQuestionResultVO.setPass(Constants.FALSE); // 是否通过
-                userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE); // 成绩
-                userQuestionResultVO.setExeMessage(CodeRunStatus.NOT_ALL_PASSED.getMsg()); // 没有通过用例
-            } else if(result.getUseMemory() > judgeSubmitDTO.getSpaceLimit()) { // 超过空间限制
-                userQuestionResultVO.setPass(Constants.FALSE); // 是否通过
-                userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE); // 成绩
-                userQuestionResultVO.setExeMessage(CodeRunStatus.OUT_OF_MEMORY.getMsg());
-            } else if(result.getUseTime() > judgeSubmitDTO.getTimeLimit()) { // 超过时间限制
-                userQuestionResultVO.setPass(Constants.FALSE); // 是否通过
-                userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE); // 成绩
-                userQuestionResultVO.setExeMessage(CodeRunStatus.OUT_OF_TIME.getMsg());
-            } else {
-                userQuestionResultVO.setPass(Constants.TRUE);
-            }
-            int score = judgeSubmitDTO.getDifficulty() * JudgeConstants.DEFAULT_SCORE; // 难度*成绩
-            userQuestionResultVO.setScore(score);
+    private UserQuestionResultVO doJudge(JudgeSubmitDTO judgeSubmitDTO,
+                                         SandBoxExecuteResult sandBoxExecuteResult,
+                                         UserQuestionResultVO userQuestionResultVO) {
+        List<String> exeOutputList = sandBoxExecuteResult.getOutputList();
+        List<String> outputList = judgeSubmitDTO.getOutputList();
+        if (outputList.size() != exeOutputList.size()) {
+            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
+            userQuestionResultVO.setPass(Constants.FALSE);
+            userQuestionResultVO.setExeMessage(CodeRunStatus.NOT_ALL_PASSED.getMsg());
+            return userQuestionResultVO;
         }
+        List<UserExeResult> userExeResultList = new ArrayList<>();
+        boolean passed = resultCompare(judgeSubmitDTO, exeOutputList, outputList, userExeResultList);
+        return assembleUserQuestionResultVO(judgeSubmitDTO, sandBoxExecuteResult, userQuestionResultVO, userExeResultList, passed);
+    }
+
+    private UserQuestionResultVO assembleUserQuestionResultVO(JudgeSubmitDTO judgeSubmitDTO,
+                                                              SandBoxExecuteResult sandBoxExecuteResult,
+                                                              UserQuestionResultVO userQuestionResultVO,
+                                                              List<UserExeResult> userExeResultList, boolean passed) {
+        userQuestionResultVO.setUserExeResultList(userExeResultList);
+        if (!passed) {
+            userQuestionResultVO.setPass(Constants.FALSE);
+            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
+            userQuestionResultVO.setExeMessage(CodeRunStatus.NOT_ALL_PASSED.getMsg());
+            return userQuestionResultVO;
+        }
+        if (sandBoxExecuteResult.getUseMemory() > judgeSubmitDTO.getSpaceLimit()) {
+            userQuestionResultVO.setPass(Constants.FALSE);
+            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
+            userQuestionResultVO.setExeMessage(CodeRunStatus.OUT_OF_MEMORY.getMsg());
+            return userQuestionResultVO;
+        }
+        if (sandBoxExecuteResult.getUseTime() > judgeSubmitDTO.getTimeLimit()) {
+            userQuestionResultVO.setPass(Constants.FALSE);
+            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
+            userQuestionResultVO.setExeMessage(CodeRunStatus.OUT_OF_TIME.getMsg());
+            return userQuestionResultVO;
+        }
+        userQuestionResultVO.setPass(Constants.TRUE);
+        int score = judgeSubmitDTO.getDifficulty() * JudgeConstants.DEFAULT_SCORE;
+        userQuestionResultVO.setScore(score);
+        return userQuestionResultVO;
+    }
+
+    private boolean resultCompare(JudgeSubmitDTO judgeSubmitDTO, List<String> exeOutputList,
+                                  List<String> outputList, List<UserExeResult> userExeResultList) {
+        boolean passed = true;
+        for (int index = 0; index < outputList.size(); index++) {
+            String output = outputList.get(index);
+            String exeOutPut = exeOutputList.get(index);
+            String input = judgeSubmitDTO.getInputList().get(index);
+            UserExeResult userExeResult = new UserExeResult();
+            userExeResult.setInput(input);
+            userExeResult.setOutput(output);
+            userExeResult.setExeOutput(exeOutPut);
+            userExeResultList.add(userExeResult);
+            if (!output.equals(exeOutPut)) {
+                passed = false;
+                log.info("输入：{}， 期望输出：{}， 实际输出：{} ", input, output, exeOutputList);
+            }
+        }
+        return passed;
     }
 
     private void saveUserSubmit(JudgeSubmitDTO judgeSubmitDTO, UserQuestionResultVO userQuestionResultVO) {
         UserSubmit userSubmit = new UserSubmit();
         BeanUtil.copyProperties(userQuestionResultVO, userSubmit);
-
         userSubmit.setUserId(judgeSubmitDTO.getUserId());
-        userSubmit.setUserCode(judgeSubmitDTO.getUserCode());
         userSubmit.setQuestionId(judgeSubmitDTO.getQuestionId());
         userSubmit.setExamId(judgeSubmitDTO.getExamId());
         userSubmit.setProgramType(judgeSubmitDTO.getProgramType());
+        userSubmit.setUserCode(judgeSubmitDTO.getUserCode());
+        userSubmit.setCaseJudgeRes(JSON.toJSONString(userQuestionResultVO.getUserExeResultList()));
         userSubmit.setCreateBy(judgeSubmitDTO.getUserId());
-        // 先删除上一次提交的代码记录
         userSubmitMapper.delete(new LambdaQueryWrapper<UserSubmit>()
-                .eq(UserSubmit::getUserId, judgeSubmitDTO.getUserCode())
+                .eq(UserSubmit::getUserId, judgeSubmitDTO.getUserId())
                 .eq(UserSubmit::getQuestionId, judgeSubmitDTO.getQuestionId())
-                        .isNull(judgeSubmitDTO.getExamId() == null, UserSubmit::getExamId)
+                .isNull(judgeSubmitDTO.getExamId() == null, UserSubmit::getExamId)
                 .eq(judgeSubmitDTO.getExamId() != null, UserSubmit::getExamId, judgeSubmitDTO.getExamId()));
-        // 插入数据库
         userSubmitMapper.insert(userSubmit);
     }
 }

@@ -8,10 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
-// docker 容器化
 @Configuration
 public class DockerSandBoxPoolConfig {
+
     @Value("${sandbox.docker.host:tcp://localhost:2375}")
     private String dockerHost;
 
@@ -30,31 +29,28 @@ public class DockerSandBoxPoolConfig {
     @Value("${sandbox.limit.cpu:1}")
     private Long cpuLimit;
 
-    @Value("${sandbox.docker.poll.size:4}")
-    private Long poolSize;
+    @Value("${sandbox.docker.pool.size:2}")
+    private int poolSize;
 
     @Value("${sandbox.docker.name-prefix:oj-sandbox-jdk}")
     private String containerNamePrefix;
-
-    private DockerClient dockerClient;
 
     @Bean
     public DockerClient createDockerClient() {
         DefaultDockerClientConfig clientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(dockerHost)
                 .build();
-        DockerClient dockerClient = DockerClientBuilder
+        return DockerClientBuilder
                 .getInstance(clientConfig)
                 .withDockerCmdExecFactory(new NettyDockerCmdExecFactory())
                 .build();
-        return dockerClient;
     }
 
     @Bean
-    public DockerSandBoxPool createDockerSandBoxPool() {
-        return new DockerSandBoxPool(dockerClient, sandboxImage, volumeDir,
-                memoryLimit, memorySwapLimit, cpuLimit,
-                poolSize, containerNamePrefix);
+    public DockerSandBoxPool createDockerSandBoxPool(DockerClient dockerClient) {
+        DockerSandBoxPool dockerSandBoxPool = new DockerSandBoxPool(dockerClient, sandboxImage, volumeDir, memoryLimit,
+                memorySwapLimit, cpuLimit, poolSize, containerNamePrefix);
+        dockerSandBoxPool.initDockerPool();
+        return dockerSandBoxPool;
     }
-
 }
