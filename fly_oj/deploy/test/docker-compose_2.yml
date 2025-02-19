@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  oj-gateway:
+    image: bit/oj-gateway:0.0.1-SNAPSHOT
+    # 提供了构建上下文的路径。这意味着Docker将在./flyoj-jar/gateway/目录中寻找构建所需的文件。
+    build:
+      context: ./flyoj-jar/gateway/
+    container_name: oj-gateway
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      HOST_IP: 172.31.33.12
+      SPRING_CLOUD_NACOS_SERVER_ADDR: "39.99.41.46:8848"  # 指向服务器A
+      SPRING_REDIS_HOST: "39.99.41.46"                    # Redis服务器IP
+    ports:
+      - "19090:19090"
+    privileged: true
+
+  oj-elasticsearch-server:
+    container_name: oj-elasticsearch-server
+    image: elasticsearch:8.5.3
+    ports:
+      - "9200:9200"
+    # 挂载本地目录用于存储 Elasticsearch的数据、插件。
+    volumes:
+      - ./elasticsearch/es-plugins:/usr/share/elasticsearch/plugins
+    # 设置为单节点模式，并限制 Java 虚拟机的内存使用。暂时禁用了Elasticsearch的安全特性
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms256m -Xmx256m"
+      xpack.security.enabled: false
+    # 通过执行 curl 命令检查 Elasticsearch 的集群健康状态。
+    healthcheck:
+      test: [ "CMD", "curl", "-s", "http://localhost:9200/_cluster/health?wait_for_status=green&timeout=1s" ]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+
+  oj-system:
+    image: bit/oj-system:0.0.1-SNAPSHOT
+    build:
+      context: ./flyoj-jar/system/
+    container_name: oj-system
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      HOST_IP: 172.31.33.12
+      SPRING_DATASOURCE_URL: "jdbc:mysql://39.99.41.46:3306/flyoj?useSSL=false"
+      SPRING_DATA_ELASTICSEARCH_CLUSTER-NODES: "39.99.41.46:9200"
+    ports:
+      - "9201:9201"
+    privileged: true
+    depends_on:
+      oj-elasticsearch-server:
+        condition: service_healthy
+
+  oj-friend:
+    image: bit/oj-friend:0.0.1-SNAPSHOT
+    build:
+      context: ./flyoj-jar/friend/
+    container_name: oj-friend
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      HOST_IP: 172.31.33.12
+      SPRING_CLOUD_NACOS_SERVER_ADDR: "39.99.41.46:8848"  # 指向服务器A
+      SPRING_REDIS_HOST: "39.99.41.46"                    # Redis服务器IP
+    ports:
+      - "9202:9202"
+    privileged: true
+    depends_on:
+      oj-elasticsearch-server:
+        condition: service_healthy
+
+  oj-judge:
+    image: bit/oj-judge:0.0.1-SNAPSHOT
+    build:
+      context: ./flyoj-jar/judge/
+    container_name: oj-judge
+    # 将本地目录挂载到容器内的用户代码存储目录
+    volumes:
+      - /user-code-pool:/user-code-pool
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      HOST_IP: 172.31.33.12
+      SPRING_RABBITMQ_HOST: "39.99.41.46"  # RabbitMQ服务器IP
+    privileged: true

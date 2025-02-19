@@ -24,6 +24,7 @@ create table tb_sys_user (
 
 -- docker run -d --name oj-kibana-dev -e "ELASTICSEARCH_HOSTS=http://oj-es-dev:9200" -e "I18N_LOCALE=zh-CN" -p15601:5601 --net=oj-network kibana:8.5.3
 
+-- docker run -d --name oj-rabbit-dev -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin -p 15672:15672 -p 5672:5672 rabbitmq:3.8.30-management
 
 --
 -- B端：题目列表，添加题目，编辑，删除
@@ -35,7 +36,7 @@ create table tb_question(
     difficulty tinyint not null comment '题目难度 1简单，2中等，3困难',
     time_limit int not null comment '时间限制',
     space_limit int not null comment '空间限制',
-    content varchar(3000) not null comment '题目内容',
+    content varchar(10000) not null comment '题目内容',
     question_case varchar(1000) comment '题目用例',
     default_code varchar(1000) comment '默认代码块',
     main_func varchar(1000) comment 'main函数',
@@ -114,6 +115,7 @@ create table tb_user_submit(
     program_type tinyint not null comment '代码类型 0：java，1：cpp，2：python3',
     user_code text not null comment '用户提交的代码',
     pass tinyint not null comment '0：未通过，1：已通过',
+    case_judge_res varchar(1000) comment '测试用例输出结果',
     exe_message varchar(500) not null comment '执行结果',
     score int not null default '0' comment '得分',
     -- 以下是回溯相关的字段

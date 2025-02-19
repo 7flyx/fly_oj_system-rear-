@@ -1,0 +1,17 @@
+
+spring:
+  application:
+    name: oj-judge
+  profiles:
+    # 环境配置
+    active: local
+  cloud:
+    nacos:
+      discovery:
+        namespace: 62113bd0-93ee-4621-9b30-60de09bd5520 # 来自nacos配置中心的命名空间
+        server-addr: http://localhost:8848
+      config:
+        namespace: 62113bd0-93ee-4621-9b30-60de09bd5520 # 来自nacos配置中心的命名空间
+        server-addr: http://localhost:8848
+        file-extension: yaml
+

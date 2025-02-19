@@ -1,0 +1,1 @@
+import{s as e}from"./request-DBKoyywz.js";function n(r,t){var o={userAccount:r,password:t};return e({url:"/sysUser/login",method:"post",data:o})}function i(){return e({url:"/sysUser/info",method:"get"})}function u(){return e({url:"sysUser/logout",method:"delete"})}export{u as a,i as g,n as l};
