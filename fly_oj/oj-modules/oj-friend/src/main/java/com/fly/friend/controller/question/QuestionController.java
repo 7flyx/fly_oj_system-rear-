@@ -5,11 +5,14 @@ import com.fly.common.core.domain.R;
 import com.fly.common.core.domain.TableDataInfo;
 import com.fly.friend.domain.question.QuestionQueryDTO;
 import com.fly.friend.domain.question.vo.QuestionDetailVO;
+import com.fly.friend.domain.question.vo.QuestionVO;
 import com.fly.friend.service.question.IQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/question")
@@ -21,6 +24,11 @@ public class QuestionController extends BaseController {
     @GetMapping("/semiLogin/list")
     public TableDataInfo list(QuestionQueryDTO questionQueryDTO) {
         return questionService.list(questionQueryDTO);
+    }
+
+    @GetMapping("/semiLogin/hotList")
+    public R<List<QuestionVO>> hotList() {
+        return R.success(questionService.hotList());
     }
 
     // 根据题目id，拿到题目的全部数据，在答题时 需要

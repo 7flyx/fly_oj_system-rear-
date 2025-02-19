@@ -2,31 +2,47 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.fly.system.mapper.user.UserMapper">
+<mapper namespace="com.fly.friend.mapper.user.UserSubmitMapper">
 
-    <select id="selectUserList" resultType="com.fly.system.domain.user.vo.UserVO">
+    <select id="selectCurrentUserSubmit" resultType="com.fly.friend.domain.user.UserSubmit">
         SELECT
-            user_id,
-            nick_name,
-            sex,
-            phone,
-            email,
-            wechat,
-            school_name,
-            major_name,
-            introduce,
-            status
+            submit_id,
+            pass,
+            exe_message,
+            case_judge_res
         FROM
-            tb_user
+            tb_user_submit
         <where>
-            <if test="userId !=null ">
-                userId = #{userId}
+            <if test="questionId !=null ">
+                AND question_id = #{questionId}
             </if>
-            <if test="nickName !=null and nickName !='' ">
-                AND nick_name LIKE CONCAT('%',#{nickName},'%')
+            <if test="examId !=null ">
+                AND exam_id = #{examId}
+            </if>
+            <if test="examId ==null ">
+                AND exam_id is null
+            </if>
+            <if test="userId !=null ">
+                AND user_id = #{userId}
+            </if>
+            <if test="currentTime !=null and currentTime != '' ">
+                AND (create_time &gt;= #{currentTime} or update_time &gt;= #{currentTime})
             </if>
         </where>
+
+    </select>
+
+    <select id="selectHostQuestionList" resultType="java.lang.Long">
+        SELECT
+            question_id,
+            count(question_id) hot_count
+        FROM
+            tb_user_submit
+        WHERE
+            exam_id is null
+        GROUP BY
+            question_id
         ORDER BY
-            create_time DESC
+            hot_count DESC
     </select>
 </mapper>
